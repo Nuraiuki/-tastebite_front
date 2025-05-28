@@ -1,7 +1,9 @@
 // src/api/client.js
 import axios from 'axios';
 
+console.log('Environment variables:', import.meta.env);
 const API_URL = import.meta.env.VITE_API_URL;
+console.log('API_URL:', API_URL);
 
 if (!API_URL) {
     console.error('VITE_API_URL is not set in environment variables');
@@ -18,7 +20,7 @@ const client = axios.create({
 // Add request interceptor for debugging
 client.interceptors.request.use(
     (config) => {
-        console.log('Request:', config.method.toUpperCase(), config.url);
+        console.log('Request:', config.method.toUpperCase(), config.url, 'Base URL:', config.baseURL);
         return config;
     },
     (error) => {
