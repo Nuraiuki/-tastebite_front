@@ -1,11 +1,38 @@
 // src/api/client.js
-export const API =
-  import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+import axios from 'axios';
 
-export const getJSON  = (url) => fetch(API + url).then(r => r.json());
-export const postJSON = (url, body) =>
-  fetch(API + url, {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)})
-  .then(r => r.json());
-export const putJSON  = (url, body) =>
-  fetch(API + url, {method:"PUT", headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
-export const del      = (url) => fetch(API + url,{method:"DELETE"});
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+
+const client = axios.create({
+    baseURL: API_URL,
+    withCredentials: true,
+    headers: {
+        'Content-Type': 'application/json',
+    },
+});
+
+// Add request interceptor for debugging
+client.interceptors.request.use(
+    (config) => {
+        console.log('Request:', config.method.toUpperCase(), config.url);
+        return config;
+    },
+    (error) => {
+        console.error('Request Error:', error);
+        return Promise.reject(error);
+    }
+);
+
+// Add response interceptor for debugging
+client.interceptors.response.use(
+    (response) => {
+        console.log('Response:', response.status, response.config.url);
+        return response;
+    },
+    (error) => {
+        console.error('Response Error:', error.response?.status, error.config?.url);
+        return Promise.reject(error);
+    }
+);
+
+export default client;
