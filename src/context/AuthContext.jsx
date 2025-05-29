@@ -45,19 +45,29 @@ export const AuthProvider = ({ children }) => {
 
   // Check if user is already logged in
   useEffect(() => {
+    let isMounted = true;
     const checkAuth = async () => {
       try {
         const response = await api.get('/auth/check');
-        setUser(response.data);
+        if (isMounted) {
+          setUser(response.data);
+        }
       } catch (error) {
         console.error('Auth check failed:', error.response?.data || error.message);
-        setUser(null);
+        if (isMounted) {
+          setUser(null);
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
     checkAuth();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const login = async (email, password) => {
