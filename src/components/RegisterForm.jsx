@@ -54,6 +54,8 @@ export default function RegisterForm({ onSwitch }) {
             </label>
         <input
               id="name"
+              name="name"
+              autoComplete="name"
               className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
           type="text"
               placeholder="Enter your name or nickname"
@@ -71,6 +73,8 @@ export default function RegisterForm({ onSwitch }) {
             </label>
         <input
               id="email"
+              name="email"
+              autoComplete="email"
               className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
           type="email"
               placeholder="Enter your email"
@@ -88,6 +92,8 @@ export default function RegisterForm({ onSwitch }) {
             </label>
         <input
               id="password"
+              name="new-password"
+              autoComplete="new-password"
               className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
           type="password"
               placeholder="Create a password"

@@ -48,6 +48,8 @@ export default function LoginForm({ onSwitch }) {
             </label>
         <input
               id="email"
+              name="email"
+              autoComplete="email"
               className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
           type="email"
               placeholder="Enter your email"
@@ -65,6 +67,8 @@ export default function LoginForm({ onSwitch }) {
             </label>
         <input
               id="password"
+              name="password"
+              autoComplete="current-password"
               className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
           type="password"
               placeholder="Enter your password"
