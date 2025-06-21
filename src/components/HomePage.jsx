@@ -93,7 +93,7 @@ function HomePage() {
   useEffect(() => {
     const fetchLocalRecipes = async () => {
       try {
-        const response = await axios.get('http://localhost:5001/api/recipes', {
+        const response = await axios.get('https://tastebite-back.onrender.com/api/recipes', {
           withCredentials: true
         });
         setLocalRecipes(response.data);

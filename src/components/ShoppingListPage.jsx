@@ -16,8 +16,9 @@ export default function ShoppingListPage() {
   const fetchList = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://localhost:5001/api/shopping-list', { withCredentials: true });
-      setList(response.data);
+      const response = await axios.get('https://tastebite-back.onrender.com/api/shopping-list', { withCredentials: true });
+      const sortedItems = response.data.sort((a, b) => a.is_checked - b.is_checked);
+      setList(sortedItems);
     } catch (err) {
       setError('Не удалось загрузить список покупок.');
       console.error(err);
@@ -33,17 +34,19 @@ export default function ShoppingListPage() {
   }, [user]);
 
   const handleClearList = async () => {
-    try {
-      await axios.delete('http://localhost:5001/api/shopping-list', { withCredentials: true });
-      setList([]);
-    } catch (err) {
-      setError('Не удалось очистить список.');
+    if (window.confirm('Are you sure you want to clear your shopping list?')) {
+      try {
+        await axios.delete('https://tastebite-back.onrender.com/api/shopping-list', { withCredentials: true });
+        setList([]);
+      } catch (err) {
+        setError('Не удалось очистить список.');
+      }
     }
   };
 
   const handleDeleteItem = async (itemId) => {
     try {
-      await axios.delete(`http://localhost:5001/api/shopping-list/${itemId}`, { withCredentials: true });
+      await axios.delete(`https://tastebite-back.onrender.com/api/shopping-list/${itemId}`, { withCredentials: true });
       setList(list.filter(item => item.id !== itemId));
     } catch (err) {
       setError('Не удалось удалить элемент.');
@@ -55,7 +58,7 @@ export default function ShoppingListPage() {
     if (!item) return;
 
     try {
-      const response = await axios.put(`http://localhost:5001/api/shopping-list/${itemId}/toggle`, {}, { withCredentials: true });
+      const response = await axios.put(`https://tastebite-back.onrender.com/api/shopping-list/${itemId}/toggle`, {}, { withCredentials: true });
       setList(list.map(i => i.id === itemId ? response.data : i));
     } catch (err) {
       setError('Не удалось обновить элемент.');
@@ -65,8 +68,10 @@ export default function ShoppingListPage() {
   const handleShare = async () => {
     setShareLoading(true);
     try {
-      const response = await axios.post('http://localhost:5001/api/shopping-list/share', {}, { withCredentials: true });
-      setShareUrl(response.data.share_url);
+      const response = await axios.post('https://tastebite-back.onrender.com/api/shopping-list/share', {}, { withCredentials: true });
+      const { token } = response.data;
+      const shareableLink = `${window.location.origin}/public-shopping-list/${token}`;
+      setShareUrl(shareableLink);
       setShowShareModal(true);
     } catch (err) {
       setError('Не удалось создать ссылку для шеринга.');

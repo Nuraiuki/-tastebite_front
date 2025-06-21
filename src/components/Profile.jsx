@@ -46,10 +46,10 @@ export default function Profile() {
         setError(null);
 
         const [profileRes, recipesRes, favoritesRes, ratingsRes] = await Promise.all([
-          axios.get('http://localhost:5001/api/profile', { withCredentials: true }),
-          axios.get('http://localhost:5001/api/profile/recipes', { withCredentials: true }),
-          axios.get('http://localhost:5001/api/profile/favorites', { withCredentials: true }),
-          axios.get('http://localhost:5001/api/profile/ratings', { withCredentials: true })
+          axios.get('https://tastebite-back.onrender.com/api/profile', { withCredentials: true }),
+          axios.get('https://tastebite-back.onrender.com/api/profile/recipes', { withCredentials: true }),
+          axios.get('https://tastebite-back.onrender.com/api/profile/favorites', { withCredentials: true }),
+          axios.get('https://tastebite-back.onrender.com/api/profile/ratings', { withCredentials: true })
         ]);
 
         setProfile(profileRes.data);
@@ -66,7 +66,7 @@ export default function Profile() {
 
     const fetchUserStats = async () => {
       try {
-        const response = await axios.get('http://localhost:5001/api/profile/stats', {
+        const response = await axios.get('https://tastebite-back.onrender.com/api/profile/stats', {
           withCredentials: true
         });
         setStats(response.data);
@@ -96,7 +96,7 @@ export default function Profile() {
     }
 
     try {
-      await axios.delete(`${API_URL}/profile`, { withCredentials: true });
+      await axios.delete('https://tastebite-back.onrender.com/api/profile', { withCredentials: true });
       logout();
       navigate('/');
     } catch (err) {
@@ -128,7 +128,7 @@ export default function Profile() {
       }
 
       const response = await axios.put(
-        'http://localhost:5001/api/profile',
+        'https://tastebite-back.onrender.com/api/profile',
         formData,
         {
           withCredentials: true,
@@ -190,7 +190,7 @@ export default function Profile() {
 
     const fullAvatarUrl = avatarUrl.startsWith('http') 
       ? avatarUrl 
-      : `http://localhost:5001${avatarUrl}`;
+      : `https://tastebite-back.onrender.com${avatarUrl}`;
 
     return (
       <img

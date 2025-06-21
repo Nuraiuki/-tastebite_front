@@ -16,6 +16,7 @@ import {
   LineElement,
 } from 'chart.js';
 import { Bar, Doughnut, Line } from 'react-chartjs-2';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 
 // Register ChartJS components
 ChartJS.register(
@@ -31,7 +32,7 @@ ChartJS.register(
 );
 
 // API URL
-const API_URL = 'http://localhost:5001/api';
+const API_URL = 'https://tastebite-back.onrender.com/api';
 
 // Chart options
 const barOptions = {

@@ -17,7 +17,7 @@ export default function GenerateRecipeModal({ isOpen, onClose }) {
 
     try {
       // Сначала получаем сгенерированный рецепт
-      const generateResponse = await axios.post('http://localhost:5001/api/ai/generate-recipe', {
+      const generateResponse = await axios.post('https://tastebite-back.onrender.com/api/ai/generate-recipe', {
         ingredients: prompt.trim().split(',').map(item => item.trim())
       }, {
         withCredentials: true
@@ -25,7 +25,7 @@ export default function GenerateRecipeModal({ isOpen, onClose }) {
 
       if (generateResponse.data) {
         // Затем создаем рецепт в базе данных
-        const createResponse = await axios.post('http://localhost:5001/api/recipes', {
+        const createResponse = await axios.post('https://tastebite-back.onrender.com/api/recipes', {
           title: generateResponse.data.title,
           category: generateResponse.data.category,
           area: generateResponse.data.area,

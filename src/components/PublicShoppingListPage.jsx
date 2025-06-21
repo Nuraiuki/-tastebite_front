@@ -15,7 +15,7 @@ export default function PublicShoppingListPage() {
     const fetchPublicList = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:5001/api/public/shopping-list/${token}`);
+        const response = await axios.get(`https://tastebite-back.onrender.com/api/public/shopping-list/${token}`);
         const sortedItems = response.data.items.sort((a, b) => a.is_checked - b.is_checked);
         setList(sortedItems);
         setOwnerName(response.data.owner_name);

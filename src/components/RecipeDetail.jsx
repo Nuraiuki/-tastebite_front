@@ -66,7 +66,7 @@ export default function RecipeDetail() {
   useEffect(() => {
     const fetchRecipe = async () => {
       try {
-        const res = await axios.get(`http://localhost:5001/api/recipes/${id}`);
+        const res = await axios.get(`https://tastebite-back.onrender.com/api/recipes/${id}`);
         setRecipe(res.data);
       } catch (err) {
         console.error('Error fetching recipe:', err);
@@ -229,7 +229,7 @@ export default function RecipeDetail() {
       };
 
       const response = await axios.put(
-        `http://localhost:5001/api/recipes/${id}`,
+        `https://tastebite-back.onrender.com/api/recipes/${id}`,
         recipeData,
         { withCredentials: true }
       );
@@ -260,7 +260,7 @@ export default function RecipeDetail() {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`http://localhost:5001/api/recipes/${id}`, {
+      await axios.delete(`https://tastebite-back.onrender.com/api/recipes/${id}`, {
         withCredentials: true
       });
       setShowToast(true);
@@ -276,7 +276,7 @@ export default function RecipeDetail() {
   const handleAddToShoppingList = async (recipeId) => {
     try {
       const response = await axios.post(
-        `http://localhost:5001/api/shopping-list/add-recipe/${recipeId}`,
+        `https://tastebite-back.onrender.com/api/shopping-list/add-recipe/${recipeId}`,
         {},
         { withCredentials: true }
       );

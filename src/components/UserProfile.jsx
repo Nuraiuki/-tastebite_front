@@ -24,10 +24,10 @@ export default function UserProfile() {
         setError(null);
         
         // Fetch the user data
-        const userResponse = await axios.get(`http://localhost:5001/api/users/${userId}`);
+        const userResponse = await axios.get(`https://tastebite-back.onrender.com/api/users/${userId}`);
         
         // Fetch the user's created recipes
-        const recipesResponse = await axios.get(`http://localhost:5001/api/users/${userId}/recipes`);
+        const recipesResponse = await axios.get(`https://tastebite-back.onrender.com/api/users/${userId}/recipes`);
         
         setProfile(userResponse.data);
         setRecipes(recipesResponse.data);
@@ -55,7 +55,7 @@ export default function UserProfile() {
 
     const fullAvatarUrl = avatarUrl.startsWith('http') 
       ? avatarUrl 
-      : `http://localhost:5001${avatarUrl}`;
+      : `https://tastebite-back.onrender.com${avatarUrl}`;
 
     return (
       <img

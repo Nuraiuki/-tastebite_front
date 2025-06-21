@@ -20,7 +20,7 @@ export default function MyRecipes() {
   useEffect(() => {
     const fetchRecipes = async () => {
       try {
-        const response = await fetch('http://localhost:5001/api/recipes?user_recipes=true', {
+        const response = await fetch('https://tastebite-back.onrender.com/api/recipes?user_recipes=true', {
           credentials: 'include'
         });
         

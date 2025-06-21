@@ -8,6 +8,13 @@ import { useAuth } from '../context/AuthContext';
 import LoadingScreen from './LoadingScreen';
 import Toast from '../components/ui/Toast';
 import GenerateRecipeModal from './GenerateRecipeModal';
+import { API_BASE_URL } from '../utils/api';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import IngredientItem from './dnd/IngredientItem';
+import InstructionItem from './dnd/InstructionItem';
+import { DEFAULT_IMG } from '../utils/constants';
+import Button from '../components/ui/Button';
 
 export default function CreateRecipe() {
   /* ─────── state / hooks ─────── */
@@ -48,18 +55,19 @@ export default function CreateRecipe() {
 
   /* ─────── fetch categories/areas once ─────── */
   useEffect(() => {
-    (async () => {
+    const fetchInitialData = async () => {
       try {
         const [cat, ar] = await Promise.all([
-          axios.get('http://localhost:5001/api/external/categories'),
-          axios.get('http://localhost:5001/api/external/areas')
+          axios.get('https://tastebite-back.onrender.com/api/external/categories'),
+          axios.get('https://tastebite-back.onrender.com/api/external/areas')
         ]);
-        setCategories(cat.data);
-        setAreas(ar.data);
+        setCategories(cat.data.map(c => ({ value: c.strCategory, label: c.strCategory })));
+        setAreas(ar.data.map(a => ({ value: a.strArea, label: a.strArea })));
       } catch (e) {
         setError('Failed to load categories & areas');
       }
-    })();
+    };
+    fetchInitialData();
   }, []);
 
   /* ─────── helpers ─────── */
@@ -122,7 +130,7 @@ export default function CreateRecipe() {
     try {
       setLoading(true); setError('');
       const { data } = await axios.post(
-        'http://localhost:5001/api/recipes',
+        'https://tastebite-back.onrender.com/api/recipes',
         { ...formData, image_url: formData.image_url || DEFAULT_IMG },
         { withCredentials: true }
       );

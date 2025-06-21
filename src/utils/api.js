@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Base API URL
-export const API_BASE_URL = 'http://localhost:5001/api';
+export const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://tastebite-back.onrender.com/api';
 
 // Create axios instance with default configuration
 export const api = axios.create({

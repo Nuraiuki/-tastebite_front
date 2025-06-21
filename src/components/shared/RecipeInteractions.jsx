@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import StarRating from '../ui/StarRating';
 import { Link } from 'react-router-dom';
+import { FaHeart, FaRegHeart, FaComment, FaShare, FaBookmark, FaRegBookmark } from 'react-icons/fa';
 
 export default function RecipeInteractions({ recipeId }) {
   const { user } = useAuth();
@@ -13,7 +14,7 @@ export default function RecipeInteractions({ recipeId }) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const API_URL = 'http://localhost:5001/api';
+  const API_URL = 'https://tastebite-back.onrender.com/api';
 
   useEffect(() => {
     if (recipeId) {
@@ -106,18 +107,31 @@ export default function RecipeInteractions({ recipeId }) {
     }
   };
 
+  const getAvatarUrl = (avatarUrl) => {
+    if (!avatarUrl) {
+      return `https://i.pravatar.cc/40?u=${Math.random()}`;
+    }
+    return avatarUrl.startsWith('http')
+      ? avatarUrl
+      : `https://tastebite-back.onrender.com${avatarUrl}`;
+  };
+
+  const handleShare = async () => {
+    // Implementation of handleShare function
+  };
+
   const renderAvatar = (avatarUrl) => {
     if (!avatarUrl) {
       return (
-        <span className="material-icons text-2xl text-orange-500 flex items-center justify-center h-full">
-          person
-        </span>
+        <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
+          <span className="text-lg font-bold text-white">?</span>
+        </div>
       );
     }
 
     const fullAvatarUrl = avatarUrl.startsWith('http') 
       ? avatarUrl 
-      : `http://localhost:5001${avatarUrl}`;
+      : `https://tastebite-back.onrender.com${avatarUrl}`;
 
     return (
       <img
@@ -129,9 +143,9 @@ export default function RecipeInteractions({ recipeId }) {
           e.target.onerror = null;
           e.target.src = null;
           e.target.parentElement.innerHTML = `
-            <span class="material-icons text-2xl text-orange-500 flex items-center justify-center h-full">
-              person
-            </span>
+            <div class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
+              <span class="text-lg font-bold text-white">?</span>
+            </div>
           `;
         }}
       />

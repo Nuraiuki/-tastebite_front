@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import RecipeInteractions from './shared/RecipeInteractions';
 import LoadingScreen from './LoadingScreen';
 
-const API_URL = 'http://localhost:5001/api';
+const API_URL = 'https://tastebite-back.onrender.com/api';
 
 const handleAddToShoppingList = async (localRecipeId, recipeTitle) => {
   if (!localRecipeId) {
@@ -73,7 +73,7 @@ export default function MealPage() {
               
               // First check if this recipe already exists in our database
               const checkResponse = await axios.get(
-                `http://localhost:5001/api/recipes?external_id=${id}`,
+                `https://tastebite-back.onrender.com/api/recipes?external_id=${id}`,
                 { withCredentials: true }
               );
               
@@ -87,7 +87,7 @@ export default function MealPage() {
                 // Otherwise, import the recipe
                 try {
                   const importResponse = await axios.post(
-                    `http://localhost:5001/api/import-external-recipe`,
+                    `https://tastebite-back.onrender.com/api/import-external-recipe`,
                     {
                       externalId: id,
                       title: response.data.meals[0].strMeal,
