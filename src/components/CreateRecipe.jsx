@@ -9,10 +9,6 @@ import LoadingScreen from './LoadingScreen';
 import Toast from '../components/ui/Toast';
 import GenerateRecipeModal from './GenerateRecipeModal';
 import { API_BASE_URL } from '../utils/api';
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
-import IngredientItem from './dnd/IngredientItem';
-import InstructionItem from './dnd/InstructionItem';
 import { DEFAULT_IMG } from '../utils/constants';
 import Button from '../components/ui/Button';
 
