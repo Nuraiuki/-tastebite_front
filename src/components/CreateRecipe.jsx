@@ -9,7 +9,6 @@ import LoadingScreen from './LoadingScreen';
 import Toast from '../components/ui/Toast';
 import GenerateRecipeModal from './GenerateRecipeModal';
 import { API_BASE_URL } from '../utils/api';
-import { DEFAULT_IMG } from '../utils/constants';
 import Button from '../components/ui/Button';
 
 export default function CreateRecipe() {
