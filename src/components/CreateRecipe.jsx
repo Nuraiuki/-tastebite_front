@@ -7,6 +7,7 @@ import { Input } from './ui/Input';
 import { useAuth } from '../context/AuthContext';
 import LoadingScreen from './LoadingScreen';
 import Toast from '../components/ui/Toast';
+import GenerateRecipeModal from './GenerateRecipeModal';
 
 export default function CreateRecipe() {
   /* ─────── state / hooks ─────── */
@@ -18,6 +19,7 @@ export default function CreateRecipe() {
   const [categories, setCategories]     = useState([]);
   const [areas, setAreas]               = useState([]);
   const [currentStep, setCurrentStep]   = useState(1);
+  const [isGenerateModalOpen, setIsGenerateModalOpen] = useState(false);
   const totalSteps                      = 4;
 
   const [formData, setFormData] = useState({
@@ -84,63 +86,8 @@ export default function CreateRecipe() {
   const ingredientNames = () =>
     formData.ingredients.map(i => i.name.trim()).filter(Boolean);
 
-  const handleGenerateRecipe = async () => {
-    let names = ingredientNames();
-
-    if (!names.length) {
-      const raw = window.prompt(
-        'Enter ingredients (comma-separated):',
-        'chicken breast, garlic, lemon'
-      );
-      if (!raw) return; // cancelled
-      names = raw.split(',').map(s => s.trim()).filter(Boolean);
-      setFormData(p => ({
-        ...p,
-        ingredients: names.map(n => ({ name: n, measure: '' }))
-      }));
-    }
-
-    try {
-      setLoading(true); setError('');
-      const { data } = await axios.post(
-        'http://localhost:5001/api/ai/generate-recipe',
-        { ingredients: names },
-        { withCredentials: true }
-      );
-
-      const instr = Array.isArray(data.instructions)
-        ? data.instructions.join('\n')
-        : (data.instructions || '');
-
-      const catNames  = categories.map(c => c.name.toLowerCase());
-      const areaNames = areas.map(a => a.name.toLowerCase());
-
-      const safeCat  = catNames.includes((data.category||'').toLowerCase())
-        ? data.category
-        : (categories[0]?.name || '');
-      const safeArea = areaNames.includes((data.area||'').toLowerCase())
-        ? data.area
-        : (areas[0]?.name || '');
-
-      setFormData(prev => ({
-        ...prev,
-        title: data.title || prev.title,
-        category: safeCat,
-        area: safeArea,
-        ingredients: Array.isArray(data.ingredients)
-          ? data.ingredients.map(n =>
-              typeof n === 'string'
-                ? { name: n, measure: '' }
-                : { name: n.name || '', measure: n.measure || '' }
-            )
-          : prev.ingredients,
-        instructions: instr || prev.instructions
-      }));
-      setAiPreview({ ...data, instructions: instr });
-      setCurrentStep(4);
-    } catch (e) {
-      setError(e.response?.data?.error || 'AI generation failed');
-    } finally { setLoading(false); }
+  const handleGenerateRecipe = () => {
+    setIsGenerateModalOpen(true);
   };
 
   /* ─────── validation ─────── */
@@ -289,9 +236,9 @@ export default function CreateRecipe() {
               <button
                 type="button"
                 onClick={handleGenerateRecipe}
-                className="inline-flex items-center px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700">
+                className="inline-flex items-center px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600">
                 <span className="material-icons mr-2">auto_fix_high</span>
-                Сгенерировать рецепт полностью
+                Generate Recipe
               </button>
 
               {aiPreview &&
@@ -457,6 +404,11 @@ export default function CreateRecipe() {
 
       {showToast &&
         <Toast message="Recipe created!" onClose={()=>setShowToast(false)}/>}
+
+      <GenerateRecipeModal 
+        isOpen={isGenerateModalOpen}
+        onClose={() => setIsGenerateModalOpen(false)}
+      />
     </Container>
   );
 }

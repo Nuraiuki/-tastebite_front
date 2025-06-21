@@ -3,12 +3,21 @@ import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import Container from './Container';
 import { Card, CardContent } from './ui/Card';
+import { useAuth } from '../context/AuthContext';
 
 export default function CategoryPage() {
   const { category } = useParams();
+  const { user } = useAuth();
   const [meals, setMeals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const DEFAULT_RECIPE_IMAGE = 'data:image/svg+xml;base64,' + btoa(`
+    <svg width="400" height="400" xmlns="http://www.w3.org/2000/svg">
+      <rect width="400" height="400" fill="#fff7ed"/>
+      <text x="50%" y="50%" font-family="Material Icons" font-size="100" fill="#fb923c" text-anchor="middle" dominant-baseline="middle">TasteBite</text>
+    </svg>
+  `);
 
   useEffect(() => {
     const fetchMealsByCategory = async () => {
@@ -62,21 +71,26 @@ export default function CategoryPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {meals.map((meal) => (
               <Link to={`/meal/${meal.idMeal}`} key={meal.idMeal}>
-                <Card className="h-full group hover:shadow-lg transition-all duration-200">
+                <Card className="group hover:shadow-lg transition duration-300">
+                  <div className="relative">
                   <img
                     src={meal.strMealThumb}
                     alt={meal.strMeal}
-                    className="w-full h-48 object-cover"
+                      className="w-full h-52 object-cover rounded-t"
                     onError={(e) => {
-                      e.target.src = 'https://via.placeholder.com/300x200?text=No+Image';
+                        e.target.src = DEFAULT_RECIPE_IMAGE;
                     }}
                   />
+               
+                  </div>
                   <CardContent>
-                    <h3 className="text-lg font-semibold group-hover:text-orange-500 transition-colors">
+                    <h3 className="text-base font-semibold text-gray-800 group-hover:text-orange-500 transition-colors">
                       {meal.strMeal}
                     </h3>
-                    <p className="text-sm text-orange-500 mt-2 group-hover:underline">
-                      View Recipe →
+                    <p className="text-sm text-gray-600">Category: {category}</p>
+                    <p className="text-sm text-orange-500 mt-2 flex items-center">
+                      {user ? 'View recipe' : 'Sign in to view recipe'}
+                      <span className="material-icons ml-1 text-sm">arrow_forward</span>
                     </p>
                   </CardContent>
                 </Card>

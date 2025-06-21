@@ -311,7 +311,7 @@ export default function RecipeDetail() {
           <p className="text-sm text-gray-500 mt-2">
             {recipe?.area} • {recipe?.category}
           </p>
-          {recipe?.author && !recipe.author.is_system && recipe.author.name !== "Tastebite System" && (
+          {recipe?.author && !recipe.author.is_system && recipe.author.name !== "Tastebite System" && !recipe.isExternal && !recipe.external_id && (
             <p className="text-sm text-blue-500 mt-1">
               <Link to={`/user-profile/${recipe.author.id}`} className="hover:underline flex items-center justify-center">
                 <span className="material-icons text-sm mr-1">person</span>

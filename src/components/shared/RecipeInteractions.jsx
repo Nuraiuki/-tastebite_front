@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import StarRating from '../ui/StarRating';
+import { Link } from 'react-router-dom';
 
 export default function RecipeInteractions({ recipeId }) {
   const { user } = useAuth();
@@ -105,6 +106,38 @@ export default function RecipeInteractions({ recipeId }) {
     }
   };
 
+  const renderAvatar = (avatarUrl) => {
+    if (!avatarUrl) {
+      return (
+        <span className="material-icons text-2xl text-orange-500 flex items-center justify-center h-full">
+          person
+        </span>
+      );
+    }
+
+    const fullAvatarUrl = avatarUrl.startsWith('http') 
+      ? avatarUrl 
+      : `http://localhost:5001${avatarUrl}`;
+
+    return (
+      <img
+        src={fullAvatarUrl}
+        alt="Profile avatar"
+        className="w-full h-full object-cover"
+        onError={(e) => {
+          console.error('Error loading avatar:', e);
+          e.target.onerror = null;
+          e.target.src = null;
+          e.target.parentElement.innerHTML = `
+            <span class="material-icons text-2xl text-orange-500 flex items-center justify-center h-full">
+              person
+            </span>
+          `;
+        }}
+      />
+    );
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center py-4">
@@ -114,7 +147,7 @@ export default function RecipeInteractions({ recipeId }) {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded">
           {error}
@@ -142,9 +175,44 @@ export default function RecipeInteractions({ recipeId }) {
         <StarRating rating={rating} onRate={handleRating} />
       </div>
 
-      <div>
-        <h3 className="text-lg font-semibold mb-4">Comments</h3>
-        <form onSubmit={handleAddComment} className="mb-6">
+      <div className="bg-white rounded-lg p-6 shadow">
+        <h3 className="text-xl font-semibold mb-4">Comments</h3>
+        
+        {loading ? (
+          <div className="flex justify-center">
+            <div className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        ) : error ? (
+          <div className="text-red-500">{error}</div>
+        ) : (
+          <div className="space-y-4">
+            {comments.map(comment => (
+              <div key={comment.id} className="border-b pb-4 last:border-b-0">
+                <div className="flex items-start gap-3">
+                  <Link to={`/user-profile/${comment.user.id}`} className="flex-shrink-0">
+                    <div className="w-10 h-10 rounded-full overflow-hidden bg-orange-100">
+                      {renderAvatar(comment.user.avatar)}
+                    </div>
+                  </Link>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Link to={`/user-profile/${comment.user.id}`} className="font-medium text-gray-900 hover:text-orange-500">
+                        {comment.user.name}
+                      </Link>
+                      <span className="text-sm text-gray-500">
+                        {new Date(comment.created_at).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <p className="text-gray-700">{comment.content}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {user && (
+          <div className="mt-6">
           <textarea
             value={comment}
             onChange={(e) => setComment(e.target.value)}
@@ -153,32 +221,14 @@ export default function RecipeInteractions({ recipeId }) {
             rows="3"
           />
           <button
-            type="submit"
+              onClick={handleAddComment}
             disabled={!comment.trim()}
             className="mt-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Post Comment
           </button>
-        </form>
-
-        <div className="space-y-4">
-          {comments.map((comment) => (
-            <div key={comment.id} className="bg-gray-50 p-4 rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="h-8 w-8 rounded-full bg-orange-100 flex items-center justify-center">
-                  <span className="material-icons text-orange-500 text-sm">person</span>
                 </div>
-                <div>
-                  <div className="font-medium text-gray-900">{comment.user.name}</div>
-                  <div className="text-sm text-gray-500">
-                    {new Date(comment.created_at).toLocaleDateString()}
-                  </div>
-                </div>
-              </div>
-              <p className="text-gray-700">{comment.content}</p>
-            </div>
-          ))}
-        </div>
+        )}
       </div>
     </div>
   );

@@ -14,7 +14,6 @@ import CategoryPage from './components/CategoryPage';
 import LoadingScreen from './components/LoadingScreen';
 import './App.css';
 
-// Protected Route component
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
   
@@ -36,12 +35,10 @@ function App() {
   const [showLoading, setShowLoading] = useState(true);
   
   useEffect(() => {
-    // If auth is done loading quickly, don't show the loading screen
     if (!loading) {
       setShowLoading(false);
     }
     
-    // Always hide loading screen after a timeout to prevent it getting stuck
     const timer = setTimeout(() => {
       setShowLoading(false);
     }, 3000);

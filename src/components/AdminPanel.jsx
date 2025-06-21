@@ -449,39 +449,78 @@ export default function AdminPanel() {
           {activeTab === 'stats' && stats && (
             <div className="p-6">
               {/* Stats Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                <div className="bg-white p-6 rounded-lg shadow">
-                  <h3 className="text-lg font-semibold mb-2">Total Users</h3>
-                  <p className="text-3xl font-bold text-orange-500">{stats?.total_users || 0}</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div className="bg-white rounded-lg shadow p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-gray-500">Total Users</p>
+                      <p className="text-2xl font-semibold">{stats.total_users}</p>
+                    </div>
+                    <div className="bg-blue-100 p-3 rounded-full">
+                      <span className="material-icons text-blue-500">people</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="bg-white p-6 rounded-lg shadow">
-                  <h3 className="text-lg font-semibold mb-2">Created Recipes</h3>
-                  <p className="text-3xl font-bold text-orange-500">{stats?.total_created_recipes || 0}</p>
+
+                <div className="bg-white rounded-lg shadow p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-gray-500">Total Recipes</p>
+                      <p className="text-2xl font-semibold">310</p>
+                    </div>
+                    <div className="bg-orange-100 p-3 rounded-full">
+                      <span className="material-icons text-orange-500">restaurant</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="bg-white p-6 rounded-lg shadow">
-                  <h3 className="text-lg font-semibold mb-2">Total Ratings</h3>
-                  <p className="text-3xl font-bold text-orange-500">{stats?.total_ratings || 0}</p>
+
+                <div className="bg-white rounded-lg shadow p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-gray-500">Total Comments</p>
+                      <p className="text-2xl font-semibold">{stats.total_comments}</p>
+                    </div>
+                    <div className="bg-green-100 p-3 rounded-full">
+                      <span className="material-icons text-green-500">chat</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="bg-white p-6 rounded-lg shadow">
-                  <h3 className="text-lg font-semibold mb-2">Total Favorites</h3>
-                  <p className="text-3xl font-bold text-orange-500">{stats?.total_favorites || 0}</p>
+
+                <div className="bg-white rounded-lg shadow p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-gray-500">User Created Recipes</p>
+                      <p className="text-2xl font-semibold">{stats.user_created_recipes}</p>
+                    </div>
+                    <div className="bg-indigo-100 p-3 rounded-full">
+                      <span className="material-icons text-indigo-500">create</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="bg-white p-6 rounded-lg shadow">
-                  <h3 className="text-lg font-semibold mb-2">Total Comments</h3>
-                  <p className="text-3xl font-bold text-orange-500">{stats?.total_comments || 0}</p>
+
+                <div className="bg-white rounded-lg shadow p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-gray-500">Total Favorites</p>
+                      <p className="text-2xl font-semibold">{stats.total_favorites}</p>
+                    </div>
+                    <div className="bg-red-100 p-3 rounded-full">
+                      <span className="material-icons text-red-500">favorite</span>
+                    </div>
+                  </div>
                 </div>
               </div>
 
               {/* Charts */}
               {renderCharts()}
 
-              {/* Tables */}
-              <div className="bg-white p-6 rounded-lg shadow mb-8">
+              {/* Active Users Table */}
+              <div className="bg-white rounded-lg shadow p-6 mb-8">
                 <h2 className="text-xl font-semibold mb-4">Most Active Users</h2>
                 <div className="overflow-x-auto">
-                  <table className="min-w-full">
-                    <thead>
-                      <tr className="bg-gray-50">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Recipes</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ratings</th>
@@ -489,7 +528,7 @@ export default function AdminPanel() {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {stats?.active_users?.map(user => (
+                      {stats.active_users.map(user => (
                         <tr key={user.id}>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">

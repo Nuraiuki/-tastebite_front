@@ -3,20 +3,39 @@ import axios from 'axios';
 
 const AuthContext = createContext(null);
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+const API_URL = 'http://localhost:5001';
 
 const api = axios.create({
   baseURL: `${API_URL}/api`,
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
-  }
+    'Accept': 'application/json',
+  },
+  timeout: 10000, // 10 seconds timeout
 });
+
+// Add request interceptor for debugging
+api.interceptors.request.use(
+  (config) => {
+    console.log('Request:', config.method.toUpperCase(), config.url, 'Headers:', config.headers);
+    return config;
+  },
+  (error) => {
+    console.error('Request Error:', error);
+    return Promise.reject(error);
+  }
+);
 
 // Add response interceptor
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log('Response:', response.status, response.config.url, response.data);
+    return response;
+  },
   async (error) => {
+    console.error('Response Error:', error.response?.status, error.config?.url, error.response?.data);
+    
     const originalRequest = error.config;
     
     // If we get a 401 and haven't tried to refresh yet
@@ -39,9 +58,13 @@ api.interceptors.response.use(
   }
 );
 
-export const AuthProvider = ({ children }) => {
+export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const updateUser = (userData) => {
+    setUser(userData);
+  };
 
   // Check if user is already logged in
   useEffect(() => {
@@ -103,11 +126,11 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, register, loading, isAuthenticated: !!user }}>
+    <AuthContext.Provider value={{ user, login, logout, register, loading, isAuthenticated: !!user, updateUser }}>
       {children}
     </AuthContext.Provider>
   );
-};
+}
 
 export const useAuth = () => {
   const context = useContext(AuthContext);

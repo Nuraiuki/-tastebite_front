@@ -5,16 +5,32 @@ import Container from './Container';
 import { Link, useNavigate } from 'react-router-dom';
 
 export default function Profile() {
-  const { user, logout } = useAuth();
+  const { user, logout, updateUser } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeTab, setActiveTab] = useState('created'); // 'created', 'imported', 'favorites', 'ratings'
+  const [success, setSuccess] = useState(null);
+  const [activeTab, setActiveTab] = useState('created'); 
   const [recipes, setRecipes] = useState([]);
   const [favorites, setFavorites] = useState([]);
   const [ratings, setRatings] = useState([]);
   const [stats, setStats] = useState(null);
   const navigate = useNavigate();
+
+  // New state variables for profile editing
+  const [isEditing, setIsEditing] = useState(false);
+  const [editForm, setEditForm] = useState({
+    name: '',
+    email: '',
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState(null);
+  const [editError, setEditError] = useState(null);
+  const [editSuccess, setEditSuccess] = useState(null);
 
   const DEFAULT_RECIPE_IMAGE = 'data:image/svg+xml;base64,' + btoa(`
     <svg width="400" height="400" xmlns="http://www.w3.org/2000/svg">
@@ -63,6 +79,17 @@ export default function Profile() {
     fetchUserStats();
   }, []);
 
+  // Update editForm when profile data is loaded
+  useEffect(() => {
+    if (profile) {
+      setEditForm(prev => ({
+        ...prev,
+        name: profile.name || '',
+        email: profile.email || '',
+      }));
+    }
+  }, [profile]);
+
   const handleDeleteAccount = async () => {
     if (!window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
       return;
@@ -76,6 +103,112 @@ export default function Profile() {
       console.error('Error deleting account:', err);
       setError('Failed to delete account. Please try again.');
     }
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setSuccess(null);
+
+    try {
+      const formData = new FormData();
+      formData.append('name', editForm.name);
+      formData.append('email', editForm.email);
+      
+      if (editForm.newPassword) {
+        if (editForm.newPassword !== editForm.confirmPassword) {
+          setError('New passwords do not match');
+          return;
+        }
+        formData.append('newPassword', editForm.newPassword);
+      }
+
+      if (avatarFile) {
+        formData.append('avatar', avatarFile);
+      }
+
+      const response = await axios.put(
+        'http://localhost:5001/api/profile',
+        formData,
+        {
+          withCredentials: true,
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      // Обновляем профиль с новыми данными
+      const updatedProfile = {
+        ...response.data,
+        avatar: response.data.avatar
+      };
+      
+      setProfile(updatedProfile);
+      setSuccess('Profile updated successfully!');
+      setIsEditing(false);
+      
+      // Обновляем данные пользователя в контексте
+      updateUser(updatedProfile);
+
+      // Сбрасываем форму
+      setEditForm({
+        name: '',
+        email: '',
+        newPassword: '',
+        confirmPassword: '',
+      });
+      setAvatarFile(null);
+      setAvatarPreview(null);
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      setError(error.response?.data?.error || 'Failed to update profile');
+    }
+  };
+
+  const handleAvatarChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setAvatarFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatarPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Обновляем отображение аватара в профиле
+  const renderAvatar = (avatarUrl) => {
+    if (!avatarUrl) {
+      return (
+        <span className="material-icons text-6xl text-orange-500 flex items-center justify-center h-full">
+          person
+        </span>
+      );
+    }
+
+    const fullAvatarUrl = avatarUrl.startsWith('http') 
+      ? avatarUrl 
+      : `http://localhost:5001${avatarUrl}`;
+
+    return (
+      <img
+        src={fullAvatarUrl}
+        alt="Profile avatar"
+        className="w-full h-full object-cover"
+        onError={(e) => {
+          console.error('Error loading avatar:', e);
+          e.target.onerror = null;
+          e.target.src = null;
+          e.target.parentElement.innerHTML = `
+            <span class="material-icons text-6xl text-orange-500 flex items-center justify-center h-full">
+              person
+            </span>
+          `;
+        }}
+      />
+    );
   };
 
   if (loading) {
@@ -165,16 +298,151 @@ export default function Profile() {
         <div className="flex flex-col md:flex-row gap-8 mb-8">
           {/* User Info Card */}
           <div className="bg-white p-6 rounded-lg shadow flex-1">
-            <h2 className="text-2xl font-bold mb-4 text-gray-800">My Profile</h2>
-            <div className="flex flex-col md:flex-row gap-4 items-center">
-              <div className="bg-orange-100 rounded-full p-8 text-orange-500">
-                <span className="material-icons text-5xl">person</span>
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold text-gray-800">{profile.name}</h3>
-                <p className="text-gray-600">{profile.email}</p>
-              </div>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold text-gray-800">My Profile</h2>
+              <button
+                onClick={() => {
+                  setIsEditing(!isEditing);
+                  if (!isEditing) {
+                    setEditForm({
+                      name: profile.name,
+                      email: profile.email,
+                      currentPassword: '',
+                      newPassword: '',
+                      confirmPassword: '',
+                    });
+                  }
+                }}
+                className="text-orange-500 hover:text-orange-600 flex items-center"
+              >
+                <span className="material-icons mr-1">
+                  {isEditing ? 'close' : 'edit'}
+                </span>
+                {isEditing ? 'Cancel' : 'Edit Profile'}
+              </button>
             </div>
+
+            {isEditing ? (
+              <form onSubmit={handleEditSubmit} className="space-y-4">
+                {editError && (
+                  <div className="bg-red-50 text-red-500 p-3 rounded-lg">
+                    {editError}
+                  </div>
+                )}
+                {editSuccess && (
+                  <div className="bg-green-50 text-green-500 p-3 rounded-lg">
+                    {editSuccess}
+                  </div>
+                )}
+
+                <div className="flex flex-col items-center mb-4">
+                  <div className="relative">
+                    <div className="w-32 h-32 rounded-full overflow-hidden bg-orange-100">
+                      {avatarPreview ? (
+                        <img
+                          src={avatarPreview}
+                          alt="Avatar preview"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : renderAvatar(profile?.avatar)}
+                    </div>
+                    <label
+                      htmlFor="avatar-upload"
+                      className="absolute bottom-0 right-0 bg-orange-500 text-white p-2 rounded-full cursor-pointer hover:bg-orange-600"
+                    >
+                      <span className="material-icons">photo_camera</span>
+                    </label>
+                    <input
+                      id="avatar-upload"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleAvatarChange}
+                      className="hidden"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Name
+                  </label>
+                  <input
+                    type="text"
+                    value={editForm.name}
+                    onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                    className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    value={editForm.email}
+                    onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                    className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    required
+                  />
+                </div>
+
+                <div className="border-t pt-4 mt-4">
+                  <h3 className="text-lg font-medium text-gray-800 mb-3">Change Password</h3>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        New Password
+                      </label>
+                      <input
+                        type="password"
+                        value={editForm.newPassword}
+                        onChange={(e) => setEditForm({ ...editForm, newPassword: e.target.value })}
+                        className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Confirm New Password
+                      </label>
+                      <input
+                        type="password"
+                        value={editForm.confirmPassword}
+                        onChange={(e) => setEditForm({ ...editForm, confirmPassword: e.target.value })}
+                        className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-end space-x-3">
+                  <button
+                    type="button"
+                    onClick={() => setIsEditing(false)}
+                    className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
+                  >
+                    Save Changes
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <div className="flex flex-col md:flex-row gap-4 items-center">
+                <div className="w-32 h-32 rounded-full overflow-hidden bg-orange-100">
+                  {renderAvatar(profile?.avatar)}
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-800">{profile.name}</h3>
+                  <p className="text-gray-600">{profile.email}</p>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Stats Card */}

@@ -21,15 +21,13 @@ export default function UserProfile() {
     const fetchUserData = async () => {
       try {
         setLoading(true);
+        setError(null);
+        
         // Fetch the user data
-        const userResponse = await axios.get(`http://localhost:5001/api/users/${userId}`, {
-          withCredentials: true
-        });
+        const userResponse = await axios.get(`http://localhost:5001/api/users/${userId}`);
         
         // Fetch the user's created recipes
-        const recipesResponse = await axios.get(`http://localhost:5001/api/users/${userId}/recipes`, {
-          withCredentials: true
-        });
+        const recipesResponse = await axios.get(`http://localhost:5001/api/users/${userId}/recipes`);
         
         setProfile(userResponse.data);
         setRecipes(recipesResponse.data);
@@ -45,6 +43,38 @@ export default function UserProfile() {
       fetchUserData();
     }
   }, [userId]);
+
+  const renderAvatar = (avatarUrl) => {
+    if (!avatarUrl) {
+      return (
+        <span className="material-icons text-6xl text-orange-500 flex items-center justify-center h-full">
+          person
+        </span>
+      );
+    }
+
+    const fullAvatarUrl = avatarUrl.startsWith('http') 
+      ? avatarUrl 
+      : `http://localhost:5001${avatarUrl}`;
+
+    return (
+      <img
+        src={fullAvatarUrl}
+        alt="Profile avatar"
+        className="w-full h-full object-cover"
+        onError={(e) => {
+          console.error('Error loading avatar:', e);
+          e.target.onerror = null;
+          e.target.src = null;
+          e.target.parentElement.innerHTML = `
+            <span class="material-icons text-6xl text-orange-500 flex items-center justify-center h-full">
+              person
+            </span>
+          `;
+        }}
+      />
+    );
+  };
 
   if (loading) {
     return (
@@ -75,12 +105,14 @@ export default function UserProfile() {
         {/* User Info Card */}
         <div className="bg-white p-6 rounded-lg shadow mb-8">
           <div className="flex flex-col md:flex-row gap-4 items-center">
-            <div className="bg-orange-100 rounded-full p-8 text-orange-500">
-              <span className="material-icons text-5xl">person</span>
+            <div className="w-32 h-32 rounded-full overflow-hidden bg-orange-100">
+              {renderAvatar(profile.avatar)}
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-800">{profile.name}'s Profile</h1>
-              <p className="text-gray-600">Member since {new Date(profile.created).toLocaleDateString()}</p>
+              <h1 className="text-2xl font-bold text-gray-800">{profile.name}'s profile</h1>
+              {profile.created && (
+                <p className="text-gray-600">Member since {new Date(profile.created).toLocaleDateString()}</p>
+              )}
             </div>
           </div>
         </div>
@@ -130,7 +162,7 @@ export default function UserProfile() {
             </div>
           ) : (
             <div className="text-center py-8">
-              <p className="text-gray-500">This user hasn't created any recipes yet.</p>
+              <p className="text-gray-500">No recipes found</p>
             </div>
           )}
         </div>
