@@ -273,6 +273,20 @@ export default function RecipeDetail() {
     }
   };
 
+  const handleAddToShoppingList = async (recipeId) => {
+    try {
+      const response = await axios.post(
+        `http://localhost:5001/api/shopping-list/add-recipe/${recipeId}`,
+        {},
+        { withCredentials: true }
+      );
+      alert(response.data.message); // Replace with a better notification later
+    } catch (error) {
+      console.error('Error adding to shopping list:', error);
+      alert('Failed to add ingredients to shopping list.');
+    }
+  };
+
   if (loading) return <LoadingScreen text="" />;
   if (error || !recipe)
     return (
@@ -323,14 +337,22 @@ export default function RecipeDetail() {
 
         <div className="relative mb-10">
           <img
-            src={recipe?.image_url || DEFAULT_RECIPE_IMAGE}
-            alt={recipe?.title}
+            src={recipe.image_url || DEFAULT_RECIPE_IMAGE}
+            alt={recipe.title}
             className="w-full h-auto rounded-xl shadow-xl object-cover"
             onError={(e) => {
-              console.log('Image failed to load, using default image');
               e.target.src = DEFAULT_RECIPE_IMAGE;
             }}
           />
+          <div className="absolute bottom-4 left-4 flex gap-2">
+            <button
+              onClick={handleAddToShoppingList}
+              className="bg-white text-orange-600 hover:bg-orange-50 px-4 py-2 rounded-lg shadow-md transition-all duration-200 flex items-center gap-2"
+              title="Добавить в список покупок"
+            >
+              <span className="material-icons">shopping_cart</span>
+            </button>
+          </div>
           <div className="absolute bottom-4 right-4 flex gap-2">
             <button 
               onClick={handleDownloadPDF}
@@ -338,7 +360,6 @@ export default function RecipeDetail() {
               title="Download Recipe PDF"
             >
               <span className="material-icons">file_download</span>
-       
             </button>
             {user && recipe && user.id === recipe.author?.id && !isEditing && (
               <>
@@ -347,15 +368,13 @@ export default function RecipeDetail() {
                   className="bg-white/90 hover:bg-white text-gray-800 px-4 py-2 rounded-lg shadow-md transition-all duration-200 flex items-center gap-2"
                 >
                   <span className="material-icons text-lg">edit</span>
-        
-            </button>
-            <button 
+                </button>
+                <button 
                   onClick={() => setShowDeleteConfirm(true)}
                   className="bg-red-500/90 hover:bg-red-500 text-white px-4 py-2 rounded-lg shadow-md transition-all duration-200 flex items-center gap-2"
-            >
+                >
                   <span className="material-icons text-lg">delete</span>
-     
-            </button>
+                </button>
               </>
             )}
           </div>
@@ -637,6 +656,8 @@ export default function RecipeDetail() {
             </div>
           </div>
         )}
+
+  
       </div>
     </Container>
   );

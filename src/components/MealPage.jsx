@@ -9,6 +9,24 @@ import LoadingScreen from './LoadingScreen';
 
 const API_URL = 'http://localhost:5001/api';
 
+const handleAddToShoppingList = async (localRecipeId, recipeTitle) => {
+  if (!localRecipeId) {
+    alert('Please wait until the recipe is ready for interactions.');
+    return;
+  }
+  try {
+    const response = await axios.post(
+      `${API_URL}/shopping-list/add-recipe/${localRecipeId}`,
+      {},
+      { withCredentials: true }
+    );
+    alert(response.data.message);
+  } catch (error) {
+    console.error('Error adding to shopping list:', error);
+    alert('Failed to add ingredients to shopping list.');
+  }
+};
+
 export default function MealPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -330,6 +348,15 @@ export default function MealPage() {
               e.target.src = DEFAULT_RECIPE_IMAGE;
             }}
           />
+          <div className="absolute bottom-4 left-4 flex gap-2">
+            <button
+              onClick={() => handleAddToShoppingList(localRecipeId, meal.strMeal)}
+              className="bg-white text-orange-600 hover:bg-orange-50 px-4 py-2 rounded-lg shadow-md transition-all duration-200 flex items-center gap-2"
+              title="Добавить в список покупок"
+            >
+              <span className="material-icons">shopping_cart</span>
+            </button>
+          </div>
           <div className="absolute bottom-4 right-4 flex gap-2">
             <button 
               onClick={handleDownloadPDF}
@@ -338,7 +365,6 @@ export default function MealPage() {
             >
               <span className="material-icons">file_download</span>
             </button>
-        
           </div>
         </div>
 
@@ -382,13 +408,13 @@ export default function MealPage() {
           </div>
         </div>
 
-
         {/* Recipe Interactions */}
         {user && localRecipeId && (
           <div className="mt-8 border-t pt-8">
             <RecipeInteractions recipeId={localRecipeId} />
           </div>
         )}
+
 
         <div className="mt-16 text-center">
           <button

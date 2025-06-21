@@ -1,10 +1,12 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
 import GenerateRecipeModal from "./GenerateRecipeModal";
+import UserNav from './UserNav';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [isGenerateModalOpen, setIsGenerateModalOpen] = useState(false);
 
   const handleLogout = async () => {
@@ -55,6 +57,14 @@ export default function Navbar() {
                     >
                       <span className="material-icons mr-1 text-sm">favorite</span>
                       My Favorites
+                    </Link>
+                    <Link
+                      to="/shopping-list"
+                      className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900 hover:text-orange-500"
+                      title="Shopping List"
+                    >
+                      <span className="material-icons mr-1 text-sm">shopping_cart</span>
+                      List
                     </Link>
                   </>
                 )}

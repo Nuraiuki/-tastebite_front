@@ -24,23 +24,13 @@ export default function GenerateRecipeModal({ isOpen, onClose }) {
       });
 
       if (generateResponse.data) {
-        // Форматируем инструкции, убирая скобки и кавычки
-        const formattedInstructions = generateResponse.data.instructions
-          .replace(/[{}"]/g, '')
-          .split(',')
-          .map(step => step.trim())
-          .join('\n');
-
         // Затем создаем рецепт в базе данных
         const createResponse = await axios.post('http://localhost:5001/api/recipes', {
           title: generateResponse.data.title,
           category: generateResponse.data.category,
           area: generateResponse.data.area,
-          instructions: formattedInstructions,
-          ingredients: generateResponse.data.ingredients.map(ing => ({
-            name: ing,
-            measure: ''
-          })),
+          instructions: generateResponse.data.instructions,
+          ingredients: generateResponse.data.ingredients,
           image_url: 'https://www.themealdb.com/images/media/meals/default.jpg'
         }, {
           withCredentials: true

@@ -12,6 +12,8 @@ import UserProfile from './components/UserProfile';
 import AdminPanel from './components/AdminPanel';
 import CategoryPage from './components/CategoryPage';
 import LoadingScreen from './components/LoadingScreen';
+import ShoppingListPage from './components/ShoppingListPage';
+import PublicShoppingListPage from './components/PublicShoppingListPage';
 import './App.css';
 
 const ProtectedRoute = ({ children }) => {
@@ -88,6 +90,16 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/shopping-list"
+            element={
+              <ProtectedRoute>
+                <ShoppingListPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/list/:token" element={<PublicShoppingListPage />} />
+          <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </main>
     </div>
