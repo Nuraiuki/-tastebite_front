@@ -212,7 +212,7 @@ export default function CreateRecipe() {
                           onChange={e=>setFormData(p=>({...p,category:e.target.value}))}>
                     <option value="">Choose…</option>
                     {categories.map(c=>(
-                      <option key={c.id||c.name} value={c.name}>{c.name}</option>
+                      <option key={c.value} value={c.value}>{c.label}</option>
                     ))}
                   </select>
                   {validationErrors.category &&
@@ -227,7 +227,7 @@ export default function CreateRecipe() {
                           onChange={e=>setFormData(p=>({...p,area:e.target.value}))}>
                     <option value="">Choose…</option>
                     {areas.map(a=>(
-                      <option key={a.name} value={a.name}>{a.name}</option>
+                      <option key={a.value} value={a.value}>{a.label}</option>
                     ))}
                   </select>
                   {validationErrors.area &&
