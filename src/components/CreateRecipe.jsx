@@ -56,8 +56,8 @@ export default function CreateRecipe() {
           axios.get('https://tastebite-back.onrender.com/api/external/categories'),
           axios.get('https://tastebite-back.onrender.com/api/external/areas')
         ]);
-        setCategories(cat.data.map(c => ({ value: c.strCategory, label: c.strCategory })));
-        setAreas(ar.data.map(a => ({ value: a.strArea, label: a.strArea })));
+        setCategories(cat.data);
+        setAreas(ar.data);
       } catch (e) {
         setError('Failed to load categories & areas');
       }
@@ -212,7 +212,7 @@ export default function CreateRecipe() {
                           onChange={e=>setFormData(p=>({...p,category:e.target.value}))}>
                     <option value="">Choose…</option>
                     {categories.map(c=>(
-                      <option key={c.value} value={c.value}>{c.label}</option>
+                      <option key={c.name} value={c.name}>{c.name}</option>
                     ))}
                   </select>
                   {validationErrors.category &&
@@ -227,7 +227,7 @@ export default function CreateRecipe() {
                           onChange={e=>setFormData(p=>({...p,area:e.target.value}))}>
                     <option value="">Choose…</option>
                     {areas.map(a=>(
-                      <option key={a.value} value={a.value}>{a.label}</option>
+                      <option key={a.name} value={a.name}>{a.name}</option>
                     ))}
                   </select>
                   {validationErrors.area &&
