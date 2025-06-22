@@ -27,7 +27,7 @@ function HomePage() {
   const [showFilters, setShowFilters] = useState(false);
   const [showCategories, setShowCategories] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const recipesPerPage = 40;
+  const recipesPerPage = 12;
 
   const topCategories = [
     "Beef",
@@ -278,6 +278,15 @@ function HomePage() {
   const indexOfFirstRecipe = indexOfLastRecipe - recipesPerPage;
   const currentRecipes = sortedRecipes.slice(indexOfFirstRecipe, indexOfLastRecipe);
   const totalPages = Math.ceil(sortedRecipes.length / recipesPerPage);
+
+  // Debug information
+  console.log('Pagination debug:', {
+    totalRecipes: sortedRecipes.length,
+    recipesPerPage,
+    totalPages,
+    currentPage,
+    currentRecipesLength: currentRecipes.length
+  });
 
   // Reset to first page when filters change
   useEffect(() => {
@@ -582,11 +591,6 @@ function HomePage() {
           <h2 className="text-2xl font-semibold font-display">
             {searchTerm ? "Search Results" : "All Recipes"}
           </h2>
-          {sortedRecipes.length > 0 && (
-            <span className="text-sm text-gray-500">
-              {sortedRecipes.length} {sortedRecipes.length === 1 ? 'recipe' : 'recipes'} found
-            </span>
-          )}
         </div>
         {isLoading ? (
           <div className="flex justify-center items-center py-12">
