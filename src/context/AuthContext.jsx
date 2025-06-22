@@ -36,6 +36,11 @@ api.interceptors.response.use(
   async (error) => {
     console.error('Response Error:', error.response?.status, error.config?.url, error.response?.data);
     
+    // Don't retry auth/check requests to avoid infinite loops
+    if (error.config?.url?.includes('/auth/check')) {
+      return Promise.reject(error);
+    }
+    
     const originalRequest = error.config;
     
     // If we get a 401 and haven't tried to refresh yet
@@ -50,8 +55,7 @@ api.interceptors.response.use(
         }
       } catch (refreshError) {
         console.error('Session refresh failed:', refreshError);
-        // Clear user state on refresh failure
-        setUser(null);
+        // Don't clear user state here, let the component handle it
       }
     }
     return Promise.reject(error);
