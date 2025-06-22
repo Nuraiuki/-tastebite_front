@@ -260,16 +260,22 @@ export default function RecipeDetail() {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`https://tastebite-back.onrender.com/api/recipes/${id}`, {
+      const response = await axios.delete(`https://tastebite-back.onrender.com/api/recipes/${id}`, {
         withCredentials: true
       });
-      setShowToast(true);
+      
+      // Show success message
+      setSuccessMessage('Recipe deleted successfully!');
+      setShowDeleteConfirm(false);
+      
+      // Redirect after showing success message
       setTimeout(() => {
         navigate('/profile');
-      }, 2000);
+      }, 1500);
     } catch (err) {
       console.error('Error deleting recipe:', err);
       setError('Failed to delete recipe. Please try again.');
+      setShowDeleteConfirm(false);
     }
   };
 
@@ -280,10 +286,12 @@ export default function RecipeDetail() {
         {},
         { withCredentials: true }
       );
-      alert(response.data.message); // Replace with a better notification later
+      setSuccessMessage(response.data.message || 'Ingredients added to shopping list!');
+      setTimeout(() => setSuccessMessage(''), 3000);
     } catch (error) {
       console.error('Error adding to shopping list:', error);
-      alert('Failed to add ingredients to shopping list.');
+      setError('Failed to add ingredients to shopping list.');
+      setTimeout(() => setError(''), 3000);
     }
   };
 
@@ -361,7 +369,7 @@ export default function RecipeDetail() {
             >
               <span className="material-icons">file_download</span>
             </button>
-            {user && recipe && user.id === recipe.author?.id && !isEditing && (
+            {user && recipe && user.id === recipe.author?.id && !recipe.is_external && !recipe.external_id && !isEditing && (
               <>
                 <button
                   onClick={handleEdit}

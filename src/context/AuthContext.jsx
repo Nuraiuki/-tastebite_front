@@ -7,6 +7,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'https://tastebite-back.onrender
 
 const api = axios.create({
   baseURL: `${API_URL}/api`,
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
@@ -14,13 +15,9 @@ const api = axios.create({
   timeout: 30000, // 30 seconds timeout
 });
 
-// Add request interceptor to include JWT token
+// Add request interceptor for debugging
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('access_token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
     console.log('Request:', config.method.toUpperCase(), config.url, 'Headers:', config.headers);
     return config;
   },
@@ -58,9 +55,7 @@ api.interceptors.response.use(
         }
       } catch (refreshError) {
         console.error('Session refresh failed:', refreshError);
-        // Clear token and user state on refresh failure
-        localStorage.removeItem('access_token');
-        setUser(null);
+        // Don't clear user state here, let the component handle it
       }
     }
     return Promise.reject(error);
@@ -80,16 +75,6 @@ export function AuthProvider({ children }) {
     let isMounted = true;
     const checkAuth = async () => {
       try {
-        // Check if we have a token first
-        const token = localStorage.getItem('access_token');
-        if (!token) {
-          if (isMounted) {
-            setUser(null);
-            setLoading(false);
-          }
-          return;
-        }
-        
         const response = await api.get('/auth/check');
         if (isMounted) {
           setUser(response.data);
@@ -97,8 +82,6 @@ export function AuthProvider({ children }) {
       } catch (error) {
         console.error('Auth check failed:', error.response?.data || error.message);
         if (isMounted) {
-          // Clear invalid token
-          localStorage.removeItem('access_token');
           setUser(null);
         }
       } finally {
@@ -117,17 +100,8 @@ export function AuthProvider({ children }) {
   const login = async (email, password) => {
     try {
       const response = await api.post('/auth/login', { email, password });
-      const userData = response.data;
-      
-      // Store JWT token
-      if (userData.access_token) {
-        localStorage.setItem('access_token', userData.access_token);
-        // Remove token from user data before setting state
-        delete userData.access_token;
-      }
-      
-      setUser(userData);
-      return userData;
+      setUser(response.data);
+      return response.data;
     } catch (error) {
       console.error('Login error:', error.response?.data || error.message);
       throw error;
@@ -137,16 +111,8 @@ export function AuthProvider({ children }) {
   const register = async (email, password, name) => {
     try {
       const response = await api.post('/auth/register', { email, password, name });
-      const userData = response.data;
-      
-      // Store JWT token if provided
-      if (userData.access_token) {
-        localStorage.setItem('access_token', userData.access_token);
-        delete userData.access_token;
-      }
-      
-      setUser(userData);
-      return userData;
+      setUser(response.data);
+      return response.data;
     } catch (error) {
       console.error('Registration error:', error.response?.data || error.message);
       throw error;
@@ -156,12 +122,10 @@ export function AuthProvider({ children }) {
   const logout = async () => {
     try {
       await api.post('/auth/logout');
+      setUser(null);
     } catch (error) {
       console.error('Logout error:', error.response?.data || error.message);
-    } finally {
-      // Always clear local state and token
-      localStorage.removeItem('access_token');
-      setUser(null);
+      throw error;
     }
   };
 

@@ -12,6 +12,9 @@ export default function ShoppingListPage() {
   const [showShareModal, setShowShareModal] = useState(false);
   const [shareUrl, setShareUrl] = useState('');
   const [shareLoading, setShareLoading] = useState(false);
+  const [showClearConfirmModal, setShowClearConfirmModal] = useState(false);
+  const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
 
   const fetchList = async () => {
     try {
@@ -34,20 +37,33 @@ export default function ShoppingListPage() {
   }, [user]);
 
   const handleClearList = async () => {
-    if (window.confirm('Are you sure you want to clear your shopping list?')) {
-      try {
-        await axios.delete('https://tastebite-back.onrender.com/api/shopping-list', { withCredentials: true });
-        setList([]);
-      } catch (err) {
-        setError('Не удалось очистить список.');
-      }
+    setShowClearConfirmModal(true);
+  };
+
+  const confirmClearList = async () => {
+    try {
+      await axios.delete('https://tastebite-back.onrender.com/api/shopping-list', { withCredentials: true });
+      setList([]);
+      setShowClearConfirmModal(false);
+    } catch (err) {
+      setError('Не удалось очистить список.');
     }
   };
 
   const handleDeleteItem = async (itemId) => {
+    const item = list.find(i => i.id === itemId);
+    setItemToDelete(item);
+    setShowDeleteConfirmModal(true);
+  };
+
+  const confirmDeleteItem = async () => {
+    if (!itemToDelete) return;
+    
     try {
-      await axios.delete(`https://tastebite-back.onrender.com/api/shopping-list/${itemId}`, { withCredentials: true });
-      setList(list.filter(item => item.id !== itemId));
+      await axios.delete(`https://tastebite-back.onrender.com/api/shopping-list/${itemToDelete.id}`, { withCredentials: true });
+      setList(list.filter(item => item.id !== itemToDelete.id));
+      setShowDeleteConfirmModal(false);
+      setItemToDelete(null);
     } catch (err) {
       setError('Не удалось удалить элемент.');
     }
@@ -189,6 +205,83 @@ export default function ShoppingListPage() {
       </div>
       {showShareModal && (
         <ShareModal url={shareUrl} onClose={() => setShowShareModal(false)} />
+      )}
+      
+      {/* Clear List Confirmation Modal */}
+      {showClearConfirmModal && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div className="p-6">
+              <div className="flex items-center mb-4">
+                <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+                  <span className="material-icons text-red-600 text-xl">warning</span>
+                </div>
+              </div>
+              <div className="text-center">
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  Очистить список покупок
+                </h3>
+                <p className="text-sm text-gray-500 mb-6">
+                  Вы уверены, что хотите удалить все элементы из списка покупок? Это действие нельзя отменить.
+                </p>
+                <div className="flex justify-center space-x-3">
+                  <button
+                    onClick={() => setShowClearConfirmModal(false)}
+                    className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    Отмена
+                  </button>
+                  <button
+                    onClick={confirmClearList}
+                    className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+                  >
+                    Очистить
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Item Confirmation Modal */}
+      {showDeleteConfirmModal && itemToDelete && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div className="p-6">
+              <div className="flex items-center mb-4">
+                <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+                  <span className="material-icons text-red-600 text-xl">delete</span>
+                </div>
+              </div>
+              <div className="text-center">
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  Удалить элемент
+                </h3>
+                <p className="text-sm text-gray-500 mb-6">
+                  Вы уверены, что хотите удалить <strong>"{itemToDelete.name}"</strong> из списка покупок?
+                </p>
+                <div className="flex justify-center space-x-3">
+                  <button
+                    onClick={() => {
+                      setShowDeleteConfirmModal(false);
+                      setItemToDelete(null);
+                    }}
+                    className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    Отмена
+                  </button>
+                  <button
+                    onClick={confirmDeleteItem}
+                    className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+                  >
+                    Удалить
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </Container>
   );
