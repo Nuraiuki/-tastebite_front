@@ -98,7 +98,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="/list/:token" element={<PublicShoppingListPage />} />
+          <Route path="/public-shopping-list/:token" element={<PublicShoppingListPage />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </main>
