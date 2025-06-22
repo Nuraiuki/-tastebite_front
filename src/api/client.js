@@ -11,15 +11,18 @@ if (!API_URL) {
 
 const client = axios.create({
     baseURL: API_URL,
-    withCredentials: true,
     headers: {
         'Content-Type': 'application/json',
     },
 });
 
-// Add request interceptor for debugging
+// Add request interceptor to include JWT token
 client.interceptors.request.use(
     (config) => {
+        const token = localStorage.getItem('access_token');
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
         console.log('Request:', config.method.toUpperCase(), config.url, 'Base URL:', config.baseURL);
         return config;
     },
