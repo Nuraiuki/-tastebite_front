@@ -23,7 +23,7 @@ export default function ShoppingListPage() {
       const sortedItems = response.data.sort((a, b) => a.is_checked - b.is_checked);
       setList(sortedItems);
     } catch (err) {
-      setError('Не удалось загрузить список покупок.');
+      setError('Failed to load the shopping list.');
       console.error(err);
     } finally {
       setLoading(false);
@@ -46,7 +46,7 @@ export default function ShoppingListPage() {
       setList([]);
       setShowClearConfirmModal(false);
     } catch (err) {
-      setError('Не удалось очистить список.');
+      setError('Failed to clear the list.');
     }
   };
 
@@ -65,7 +65,7 @@ export default function ShoppingListPage() {
       setShowDeleteConfirmModal(false);
       setItemToDelete(null);
     } catch (err) {
-      setError('Не удалось удалить элемент.');
+      setError('Failed to delete the item.');
     }
   };
 
@@ -77,7 +77,7 @@ export default function ShoppingListPage() {
       const response = await axios.put(`https://tastebite-back.onrender.com/api/shopping-list/${itemId}/toggle`, {}, { withCredentials: true });
       setList(list.map(i => i.id === itemId ? response.data : i));
     } catch (err) {
-      setError('Не удалось обновить элемент.');
+      setError('Failed to update the item.');
     }
   };
 
@@ -90,7 +90,7 @@ export default function ShoppingListPage() {
       setShareUrl(shareableLink);
       setShowShareModal(true);
     } catch (err) {
-      setError('Не удалось создать ссылку для шеринга.');
+      setError('Failed to create a share link.');
     } finally {
       setShareLoading(false);
     }
@@ -102,7 +102,7 @@ export default function ShoppingListPage() {
     return (
       <Container>
         <div className="text-center py-12">
-          <p className="text-gray-500">Пожалуйста, войдите, чтобы увидеть ваш список покупок.</p>
+          <p className="text-gray-500">Please log in to view your shopping list.</p>
         </div>
       </Container>
     );
@@ -122,7 +122,7 @@ export default function ShoppingListPage() {
     <Container>
       <div className="max-w-3xl mx-auto py-8">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">Список покупок</h1>
+          <h1 className="text-3xl font-bold">Shopping List</h1>
           <div className="flex items-center gap-2">
             {list.length > 0 && (
               <button
@@ -131,7 +131,7 @@ export default function ShoppingListPage() {
                 className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2 disabled:opacity-50"
               >
                 <span className="material-icons">share</span>
-                {shareLoading ? 'Создание...' : 'Поделиться'}
+                {shareLoading ? 'Creating...' : 'Share'}
               </button>
             )}
             {list.length > 0 && (
@@ -139,7 +139,7 @@ export default function ShoppingListPage() {
                 onClick={handleClearList}
                 className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
               >
-                Очистить все
+                Clear All
               </button>
             )}
           </div>
@@ -149,8 +149,8 @@ export default function ShoppingListPage() {
 
         {list.length === 0 ? (
           <div className="text-center py-12 bg-gray-50 rounded-lg">
-            <p className="text-gray-500">Ваш список покупок пуст.</p>
-            <p className="text-gray-400 mt-2 text-sm">Добавьте рецепты, чтобы сформировать список.</p>
+            <p className="text-gray-500">Your shopping list is empty.</p>
+            <p className="text-gray-400 mt-2 text-sm">Add recipes to generate a list.</p>
           </div>
         ) : (
           <ul className="bg-white p-6 rounded-xl shadow-md space-y-4">
@@ -169,13 +169,13 @@ export default function ShoppingListPage() {
                   <div className={item.is_checked ? 'line-through' : ''}>
                     <span className="font-semibold text-lg">{item.name}</span>
                     <p className="text-sm text-gray-500">
-                      {item.measure || 'Количество не указано'}
+                      {item.measure || 'Quantity not specified'}
                     </p>
                   </div>
                 </div>
                 <div className="w-full sm:w-auto flex items-center justify-between pl-9 sm:pl-0">
                   <div className="text-xs text-gray-600 mr-4">
-                    <span className="font-bold">Из рецептов:</span>
+                    <span className="font-bold">From recipes:</span>
                     <div className="flex flex-wrap gap-1 mt-1">
                       {item.recipe_details.map(detail => (
                         detail.id ? (
@@ -193,7 +193,7 @@ export default function ShoppingListPage() {
                   <button
                     onClick={() => handleDeleteItem(item.id)}
                     className="text-gray-400 hover:text-red-500 transition-colors p-1"
-                    title="Удалить"
+                    title="Delete"
                   >
                     <span className="material-icons">delete</span>
                   </button>
@@ -219,23 +219,23 @@ export default function ShoppingListPage() {
               </div>
               <div className="text-center">
                 <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  Очистить список покупок
+                  Clear shopping list
                 </h3>
                 <p className="text-sm text-gray-500 mb-6">
-                  Вы уверены, что хотите удалить все элементы из списка покупок? Это действие нельзя отменить.
+                  Are you sure you want to delete all items from the shopping list? This action cannot be undone.
                 </p>
                 <div className="flex justify-center space-x-3">
                   <button
                     onClick={() => setShowClearConfirmModal(false)}
                     className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
                   >
-                    Отмена
+                    Cancel
                   </button>
                   <button
                     onClick={confirmClearList}
                     className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
                   >
-                    Очистить
+                    Clear
                   </button>
                 </div>
               </div>
@@ -256,10 +256,10 @@ export default function ShoppingListPage() {
               </div>
               <div className="text-center">
                 <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  Удалить элемент
+                  Delete item
                 </h3>
                 <p className="text-sm text-gray-500 mb-6">
-                  Вы уверены, что хотите удалить <strong>"{itemToDelete.name}"</strong> из списка покупок?
+                  Are you sure you want to delete <strong>"{itemToDelete.name}"</strong> from the shopping list?
                 </p>
                 <div className="flex justify-center space-x-3">
                   <button
@@ -269,13 +269,13 @@ export default function ShoppingListPage() {
                     }}
                     className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
                   >
-                    Отмена
+                    Cancel
                   </button>
                   <button
                     onClick={confirmDeleteItem}
                     className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
                   >
-                    Удалить
+                    Delete
                   </button>
                 </div>
               </div>
@@ -301,8 +301,8 @@ function ShareModal({ url, onClose }) {
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50 flex items-center justify-center">
       <div className="relative bg-white p-6 rounded-lg shadow-xl max-w-sm w-full mx-4">
-        <h3 className="text-lg font-semibold mb-4">Поделиться списком</h3>
-        <p className="text-sm text-gray-600 mb-2">Любой, у кого есть эта ссылка, сможет посмотреть ваш список покупок.</p>
+        <h3 className="text-lg font-semibold mb-4">Share shopping list</h3>
+        <p className="text-sm text-gray-600 mb-2">Anyone with this link will be able to view your shopping list.</p>
         <div className="flex items-center space-x-2">
           <input
             ref={urlRef}
@@ -315,7 +315,7 @@ function ShareModal({ url, onClose }) {
             onClick={handleCopy}
             className={`px-3 py-2 rounded-md text-white font-semibold text-sm transition-colors ${copied ? 'bg-green-500' : 'bg-blue-500 hover:bg-blue-600'}`}
           >
-            {copied ? 'Готово!' : 'Копировать'}
+            {copied ? 'Copied!' : 'Copy'}
           </button>
         </div>
         <button
